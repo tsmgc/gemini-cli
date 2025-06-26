@@ -27,6 +27,7 @@ export class DiscoveredMCPTool extends BaseTool<ToolParams, ToolResult> {
     readonly serverToolName: string,
     readonly timeout?: number,
     readonly trust?: boolean,
+    readonly mcpToolAutoApprove?: string[],
   ) {
     super(
       name,
@@ -47,6 +48,13 @@ export class DiscoveredMCPTool extends BaseTool<ToolParams, ToolResult> {
 
     if (this.trust) {
       return false; // server is trusted, no confirmation needed
+    }
+
+    if (
+      this.mcpToolAutoApprove?.includes(this.serverToolName) ||
+      this.mcpToolAutoApprove?.includes(toolAllowListKey)
+    ) {
+      return false; // tool is auto-approved, no confirmation needed
     }
 
     if (

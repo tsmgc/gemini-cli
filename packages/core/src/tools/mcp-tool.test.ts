@@ -184,7 +184,8 @@ describe('DiscoveredMCPTool', () => {
         inputSchema,
         serverToolName,
         undefined,
-        true,
+        true, // trust
+        [], // mcpToolAutoApprove
       );
       expect(
         await tool.shouldConfirmExecute({}, new AbortController().signal),
@@ -200,6 +201,9 @@ describe('DiscoveredMCPTool', () => {
         baseDescription,
         inputSchema,
         serverToolName,
+        undefined, // timeout
+        false, // trust
+        [], // mcpToolAutoApprove
       );
       expect(
         await tool.shouldConfirmExecute({}, new AbortController().signal),
@@ -216,6 +220,9 @@ describe('DiscoveredMCPTool', () => {
         baseDescription,
         inputSchema,
         serverToolName,
+        undefined, // timeout
+        false, // trust
+        [], // mcpToolAutoApprove
       );
       expect(
         await tool.shouldConfirmExecute({}, new AbortController().signal),
@@ -230,6 +237,9 @@ describe('DiscoveredMCPTool', () => {
         baseDescription,
         inputSchema,
         serverToolName,
+        undefined, // timeout
+        false, // trust
+        [], // mcpToolAutoApprove
       );
       const confirmation = await tool.shouldConfirmExecute(
         {},
@@ -261,6 +271,9 @@ describe('DiscoveredMCPTool', () => {
         baseDescription,
         inputSchema,
         serverToolName,
+        undefined, // timeout
+        false, // trust
+        [], // mcpToolAutoApprove
       );
       const confirmation = await tool.shouldConfirmExecute(
         {},
@@ -292,6 +305,9 @@ describe('DiscoveredMCPTool', () => {
         baseDescription,
         inputSchema,
         serverToolName,
+        undefined, // timeout
+        false, // trust
+        [], // mcpToolAutoApprove
       );
       const toolAllowlistKey = `${serverName}.${serverToolName}`;
       const confirmation = await tool.shouldConfirmExecute(
@@ -312,6 +328,67 @@ describe('DiscoveredMCPTool', () => {
       } else {
         throw new Error(
           'Confirmation details or onConfirm not in expected format',
+        );
+      }
+    });
+
+    it('should return false if tool is in mcpToolAutoApprove by serverToolName', async () => {
+      const tool = new DiscoveredMCPTool(
+        mockCallableToolInstance,
+        serverName,
+        toolNameForModel,
+        baseDescription,
+        inputSchema,
+        serverToolName,
+        undefined, // timeout
+        false, // trust
+        [serverToolName], // mcpToolAutoApprove
+      );
+      expect(
+        await tool.shouldConfirmExecute({}, new AbortController().signal),
+      ).toBe(false);
+    });
+
+    it('should return false if tool is in mcpToolAutoApprove by fully qualified name', async () => {
+      const toolAllowlistKey = `${serverName}.${serverToolName}`;
+      const tool = new DiscoveredMCPTool(
+        mockCallableToolInstance,
+        serverName,
+        toolNameForModel,
+        baseDescription,
+        inputSchema,
+        serverToolName,
+        undefined, // timeout
+        false, // trust
+        [toolAllowlistKey], // mcpToolAutoApprove
+      );
+      expect(
+        await tool.shouldConfirmExecute({}, new AbortController().signal),
+      ).toBe(false);
+    });
+
+    it('should return confirmation details if tool is not in mcpToolAutoApprove', async () => {
+      const tool = new DiscoveredMCPTool(
+        mockCallableToolInstance,
+        serverName,
+        toolNameForModel,
+        baseDescription,
+        inputSchema,
+        serverToolName,
+        undefined, // timeout
+        false, // trust
+        ['other-tool'], // mcpToolAutoApprove
+      );
+      const confirmation = await tool.shouldConfirmExecute(
+        {},
+        new AbortController().signal,
+      );
+      expect(confirmation).not.toBe(false);
+      if (confirmation && confirmation.type === 'mcp') {
+        expect(confirmation.type).toBe('mcp');
+      } else {
+        throw new Error(
+          'Confirmation was not of expected type MCP or was false',
         );
       }
     });

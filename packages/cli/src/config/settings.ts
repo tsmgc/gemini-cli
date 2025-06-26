@@ -64,6 +64,9 @@ export interface Settings {
   // UI setting. Does not display the ANSI-controlled terminal title.
   hideWindowTitle?: boolean;
 
+  // MCP tool auto-approval settings
+  mcpToolAutoApprove?: string[];
+
   // Add other settings here.
 }
 
